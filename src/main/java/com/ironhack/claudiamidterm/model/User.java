@@ -1,14 +1,17 @@
 package com.ironhack.claudiamidterm.model;
 
+import com.fasterxml.jackson.annotation.*;
+
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.util.*;
 
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long id;
     @NotNull
     protected String name;
@@ -17,6 +20,7 @@ public class User {
     @NotNull
     protected String password;
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "user")
+    @JsonIgnore
     private Set<Role> roles = new HashSet<>();
 
     public User() {}

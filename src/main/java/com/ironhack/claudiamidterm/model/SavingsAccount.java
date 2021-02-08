@@ -11,6 +11,8 @@ import java.time.*;
 @PrimaryKeyJoinColumn(name="id")
 @Inheritance (strategy = InheritanceType.TABLE_PER_CLASS)
 public class SavingsAccount extends Account{
+
+
     private String secretKey;
     private AccountStatus status;
     @Embedded

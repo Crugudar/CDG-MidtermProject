@@ -10,6 +10,7 @@ import java.time.*;
 @Entity
 @PrimaryKeyJoinColumn(name="id")
 public class CreditCard extends Account{
+
     @NotNull
     @Embedded
     @AttributeOverrides(value ={
@@ -23,12 +24,12 @@ public class CreditCard extends Account{
     private BigDecimal interestRate;
     private LocalDate lastInterestUpdate;
 
-    /** Constructors **/
+
     public CreditCard() {}
 
     public CreditCard(AccountHolder primaryOwner, Money balance) {super(primaryOwner, balance);}
 
-    /** Getters & Setters **/
+
     public Money getCreditLimit() {return creditLimit;}
     public void setCreditLimit(Money creditLimit) {this.creditLimit = creditLimit;}
     public BigDecimal getInterestRate() {return interestRate;}

@@ -24,6 +24,7 @@ public class Account {
             @AttributeOverride(name = "currency", column = @Column(name = "balance_currency"))
     })
     protected Money balance;
+
     @Embedded
     @AttributeOverrides(value ={
             @AttributeOverride(name = "amount", column = @Column(name = "penalty_fee_amount")),
@@ -50,6 +51,13 @@ public class Account {
         this.createdDateTime = LocalDateTime.now();
     }
 
+    public Account(AccountHolder primaryOwner, AccountHolder secondaryOwner, Money balance) {
+        this.primaryOwner = primaryOwner;
+        this.secondaryOwner = secondaryOwner;
+        this.balance = balance;
+        this.penaltyFee = new Money(new BigDecimal("40"));
+        this.createdDateTime = LocalDateTime.now();
+    }
 
     public Long getId() {return id;}
     public void setId(Long id) {this.id = id;}

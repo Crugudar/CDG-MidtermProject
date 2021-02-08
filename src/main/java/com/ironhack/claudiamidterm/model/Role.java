@@ -6,16 +6,13 @@ import com.ironhack.claudiamidterm.enums.*;
 import javax.persistence.*;
 
 @Entity
-@Table
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Enumerated(value = EnumType.STRING)
     private UserRole role;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    @JsonIgnore
+    @ManyToOne
     private User user;
 
 
@@ -26,7 +23,6 @@ public class Role {
         this.user = user;
     }
 
-    /** Getters & Setters **/
     public Long getId() {
         return id;
     }

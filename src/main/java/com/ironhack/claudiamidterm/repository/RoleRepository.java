@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.*;
 
 @Repository
-public interface TranferenceRepository extends JpaRepository<Transference, Long> {
+public interface RoleRepository extends JpaRepository<Role,Long> {
 }
