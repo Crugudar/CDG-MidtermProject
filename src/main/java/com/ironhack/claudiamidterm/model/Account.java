@@ -38,7 +38,7 @@ public class Account {
     protected List<Transference> recievedTransferences;
 
 
-    protected LocalDateTime createdDateTime;
+    protected LocalDate createdDate;
 
 
 
@@ -48,7 +48,7 @@ public class Account {
         this.primaryOwner = primaryOwner;
         this.balance = balance;
         this.penaltyFee = new Money(new BigDecimal("40"));
-        this.createdDateTime = LocalDateTime.now();
+        this.createdDate = LocalDate.now();
     }
 
     public Account(AccountHolder primaryOwner, AccountHolder secondaryOwner, Money balance) {
@@ -56,7 +56,7 @@ public class Account {
         this.secondaryOwner = secondaryOwner;
         this.balance = balance;
         this.penaltyFee = new Money(new BigDecimal("40"));
-        this.createdDateTime = LocalDateTime.now();
+        this.createdDate = LocalDate.now();
     }
 
     public Long getId() {return id;}
@@ -69,8 +69,8 @@ public class Account {
     public void setPenaltyFee(Money penaltyFee) {this.penaltyFee = penaltyFee;}
     public AccountHolder getSecondaryOwner() {return secondaryOwner;}
     public void setSecondaryOwner(AccountHolder secondaryOwner) {this.secondaryOwner = secondaryOwner;}
-    public LocalDateTime getCreatedDateTime() {return createdDateTime;}
-    public void setCreatedDateTime(LocalDateTime createdDateTime) {this.createdDateTime = createdDateTime;}
+    public LocalDate getCreatedDate() {return createdDate;}
+    public void setCreatedDate(LocalDate createdDate) {this.createdDate = createdDate;}
 
 
 }

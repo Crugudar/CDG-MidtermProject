@@ -13,7 +13,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.*;
+import java.time.*;
 import java.util.*;
+
+import static com.ironhack.claudiamidterm.utils.Calculos.calculateYears;
+import static com.ironhack.claudiamidterm.utils.Calculos.calculateMonths;
 
 @Service
 public class AccountHolderService implements IAccountHolderService {
@@ -26,6 +30,15 @@ public class AccountHolderService implements IAccountHolderService {
 
     @Autowired
     AccountRepository accountRepository;
+
+    @Autowired
+    CreditCardRepository creditCardRepository;
+
+    @Autowired
+    SavingsAccountRepository savingsAccountRepository;
+
+    @Autowired
+    CheckingAccountRepository checkingAccountRepository;
 
     @Autowired
     RoleRepository roleRepository ;
@@ -78,9 +91,65 @@ public class AccountHolderService implements IAccountHolderService {
         try{
             passwordEncoder.matches(credentials.getPassword(), accountHolder.getPassword());
             Optional<Account> account=accountRepository.findById(id);
+            Integer months=calculateMonths(account.get().getCreatedDate());
+
+            account.get().getClass();
+
+            switch (account.get().getClass().toString()){
+                case "CreditCard":
+                    Optional<CreditCard> creditcard=creditCardRepository.findById(account.get().getId());
+                    addInterests(months, creditcard.get().getInterestRate(), creditcard.get());
+                    creditcard.get().setCreatedDate(LocalDate.now());
+
+                    break;
+                case "SavingsAccount":
+                    Optional<SavingsAccount> savingsAccount= savingsAccountRepository.findById(account.get().getId());
+
+                    if(calculateYears(account.get().getCreatedDate()) >= 1) {
+                        addInterests(12, savingsAccount.get().getInterestRate(), savingsAccount.get());
+                        savingsAccountRepository.save(savingsAccount.get());
+                    }
+                    if(savingsAccount.get().isBelowMinimumBalance() && savingsAccount.get().getBalance().getAmount().compareTo(savingsAccount.get().getMinimumBalance().getAmount()) > 0){
+                        savingsAccount.get().setBelowMinimumBalance(false);
+                        savingsAccountRepository.save(savingsAccount.get());
+                    }
+
+                    break;
+                case "CheckingAccount":
+                    Optional<CheckingAccount> checkingAccount= checkingAccountRepository.findById(account.get().getId());
+                    Double balance =checkingAccount.get().getBalance().getAmount().doubleValue()-(months*12);
+                    checkingAccount.get().setBalance(new Money(new BigDecimal(balance)));
+                    checkingAccount.get().setCreatedDate(LocalDate.now());
+
+                    if(checkingAccount.get().getMinimumBalance().getAmount().compareTo(checkingAccount.get().getBalance().getAmount()) > 0 && !checkingAccount.get().isBelowMinimumBalance()){
+                        checkingAccount.get().getBalance().decreaseAmount(checkingAccount.get().getPenaltyFee());
+                        checkingAccount.get().setBelowMinimumBalance(true);
+                    }
+                    checkingAccountRepository.save(checkingAccount.get());
+                    break;
+                case "StudentChecking":
+                    break;
+                default:
+                    throw new IllegalArgumentException("Account is not of a valid kind");
+            }
+
+
+
+
+
             return account.get().getBalance();
         }catch (Exception e){
             throw new IllegalArgumentException("credentials do not correspond with any user/account");
+        }
+    }
+
+    public void addInterests(Integer months, BigDecimal interestRate, Account account){
+        Integer acum=0;
+        while (acum<months){
+            Double interest =account.getBalance().getAmount().doubleValue()*interestRate.doubleValue();
+            BigDecimal newBalance=new BigDecimal(account.getBalance().getAmount().doubleValue()+interest);
+            account.setBalance(new Money(newBalance));
+            acum++;
         }
     }
 
