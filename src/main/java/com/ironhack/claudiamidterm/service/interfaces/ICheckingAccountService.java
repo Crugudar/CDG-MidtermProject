@@ -5,4 +5,5 @@ import com.ironhack.claudiamidterm.model.*;
 
 public interface ICheckingAccountService {
     public StudentChecking create(CheckingAccountDTO checkingAccountDTO);
+
 }

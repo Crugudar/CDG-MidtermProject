@@ -2,9 +2,11 @@ package com.ironhack.claudiamidterm.controller.DTO;
 
 import com.ironhack.claudiamidterm.classes.*;
 import com.ironhack.claudiamidterm.enums.*;
+import com.ironhack.claudiamidterm.model.*;
 
 import javax.validation.constraints.*;
 import java.math.*;
+import java.util.*;
 
 public class SavingsAccountDTO {
 
@@ -54,7 +56,7 @@ public class SavingsAccountDTO {
         this.balance = new BigDecimal(balance);
         this.secretKey = secretKey;
         this.status = AccountStatus.ACTIVE;
-        this.minimumBalance = new BigDecimal("100");
+        this.minimumBalance = new BigDecimal("1000");
         this.interestRate = new BigDecimal(interestRate);
     }
 
@@ -64,7 +66,7 @@ public class SavingsAccountDTO {
         this.balance = new BigDecimal(balance);
         this.secretKey = secretKey;
         this.status = AccountStatus.ACTIVE;
-        this.minimumBalance = new BigDecimal("100");
+        this.minimumBalance = new BigDecimal("1000");
         this.interestRate = new BigDecimal("0.0025");
     }
 
@@ -83,4 +85,5 @@ public class SavingsAccountDTO {
     public void setMinimumBalance(BigDecimal minimumBalance) {this.minimumBalance = minimumBalance;}
     public BigDecimal getInterestRate() {return interestRate;}
     public void setInterestRate(BigDecimal interestRate) {this.interestRate = interestRate;}
+
 }

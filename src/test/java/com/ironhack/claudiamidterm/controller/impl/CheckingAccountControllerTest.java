@@ -61,13 +61,21 @@ class CheckingAccountControllerTest {
     }
 
     @Test
-    void create() throws Exception {
+    void create_TwoOwners_checkingAccount() throws Exception {
        AccountHolder accountHolder1= accountHolderRepository.findByName("Arturo");
         AccountHolder accountHolder2= accountHolderRepository.findByName("Clara");
-        CheckingAccountDTO checkingAccount=new CheckingAccountDTO(accountHolder1.getId(), accountHolder2.getId(),1000.00,"1234");
+        CheckingAccountDTO checkingAccount=new CheckingAccountDTO(accountHolder1.getId(),accountHolder2.getId(),1000.00,"1234");
         MvcResult result = mockMvc.perform(post("/new/checking").content(objectMapper.writeValueAsString(checkingAccount)).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isCreated()).andReturn();
         assertTrue(result.getResponse().getContentAsString().contains("Arturo"));
         assertTrue(result.getResponse().getContentAsString().contains("Clara"));
+    }
+
+    @Test
+    void create_OneOwner_checkingAccount() throws Exception {
+        AccountHolder accountHolder1= accountHolderRepository.findByName("Arturo");
+        CheckingAccountDTO checkingAccount=new CheckingAccountDTO(accountHolder1.getId(),1000.00,"1234");
+        MvcResult result = mockMvc.perform(post("/new/checking").content(objectMapper.writeValueAsString(checkingAccount)).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isCreated()).andReturn();
+        assertTrue(result.getResponse().getContentAsString().contains("Arturo"));
     }
 
     //TODO crear tests para menores de 24 y con uno y dos owners

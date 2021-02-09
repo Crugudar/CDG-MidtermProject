@@ -80,19 +80,13 @@ public class AccountHolder extends User{
         this.mailingAddress = mailingAddress;
     }
 
-    public List<Account> getPrimaryAccounts() {
-        return primaryAccounts;
-    }
 
-    public void setPrimaryAccounts(List<Account> primaryAccounts) {
-        this.primaryAccounts = primaryAccounts;
-    }
 
-    public List<Account> getSecondaryAccounts() {
-        return secondaryAccounts;
-    }
 
-    public void setSecondaryAccounts(List<Account> secondaryAccounts) {
-        this.secondaryAccounts = secondaryAccounts;
+    public List<Account> accessAllAccounts(){
+        List<Account> result = new ArrayList<>();
+        this.primaryAccounts.stream().map(result::add).collect(Collectors.toList());
+        this.secondaryAccounts.stream().map(result::add).collect(Collectors.toList());
+        return result;
     }
 }

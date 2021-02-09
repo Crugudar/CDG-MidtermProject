@@ -43,12 +43,13 @@ class SavingsControllerTest {
         AccountHolder accountHolder1=new AccountHolder("Arturo","jijijij","123456",date ,new Address("pintor sorolla", 16),new Address("pintor sorolla", 16));
         AccountHolder accountHolder2=new AccountHolder("Clara","jajajajaja", "123456",date ,new Address("pintor goya", 16), new Address("pintor sorolla", 16));
         accountHolderRepository.saveAll(List.of(accountHolder1, accountHolder2));
+
     }
 
     @AfterEach
     void tearDown() {
-        savingsAccountRepository.deleteAll();
-        accountHolderRepository.deleteAll();
+//        savingsAccountRepository.deleteAll();
+//        accountHolderRepository.deleteAll();
     }
 
     @Test

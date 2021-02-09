@@ -23,16 +23,21 @@ public class CreditCardService implements ICreditCardService {
     public CreditCard create(CreditCardDTO creditCardDTO) {
 
         Optional<AccountHolder> accountHolder1=accountHolderRepository.findById(creditCardDTO.getPrimaryOwnerId());
-        Optional<AccountHolder> accountHolder2=accountHolderRepository.findById(creditCardDTO.getSecondaryOwnerId());
+
 
         CreditCard creditCard = new CreditCard(accountHolder1.get(), new Money(creditCardDTO.getBalance()));
 
-        if (accountHolder2.isPresent()) {creditCard.setSecondaryOwner(accountHolder2.get());}
         if (creditCardDTO.getCreditLimit()!=null){
             creditCard.setCreditLimit(new Money(creditCardDTO.getCreditLimit()));
+
         }
         if (creditCardDTO.getInterestRate()!=null){
             creditCard.setInterestRate(creditCardDTO.getInterestRate());
+        }
+        if (creditCardDTO.getSecondaryOwnerId()!=null) {
+            Optional<AccountHolder> accountHolder2=accountHolderRepository.findById(creditCardDTO.getSecondaryOwnerId());
+            creditCard.setSecondaryOwner(accountHolder2.get());
+
         }
 
 

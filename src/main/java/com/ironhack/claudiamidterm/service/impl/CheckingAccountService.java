@@ -7,6 +7,8 @@ import com.ironhack.claudiamidterm.model.*;
 import com.ironhack.claudiamidterm.repository.*;
 import com.ironhack.claudiamidterm.service.interfaces.*;
 import org.springframework.beans.factory.annotation.*;
+import org.springframework.security.crypto.bcrypt.*;
+import org.springframework.security.crypto.password.*;
 import org.springframework.stereotype.*;
 
 import java.util.*;
@@ -22,40 +24,40 @@ public class CheckingAccountService implements ICheckingAccountService {
     StudentCheckingRepository studentCheckingRepository;
     @Autowired
     AccountHolderRepository accountHolderRepository;
+    @Autowired
+    UserRepository userRepository;
+
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Override
     public StudentChecking create(CheckingAccountDTO checkingAccountDTO) {
 
         Optional<AccountHolder> accountHolder1=accountHolderRepository.findById(checkingAccountDTO.getPrimaryOwnerId());
-        Optional<AccountHolder> accountHolder2=accountHolderRepository.findById(checkingAccountDTO.getSecondaryOwnerId());
-
 
         if (calculateYears(accountHolder1.get().getDateOfBirth()) < 24) {
             System.out.println("A Student Account will be created since the Account Holder is under 24");
 
-            StudentChecking studentChecking = new StudentChecking(accountHolder1.get(),
-                    new Money(checkingAccountDTO.getBalance()),
-                    checkingAccountDTO.getSecretKey(), AccountStatus.ACTIVE);
+                StudentChecking studentChecking = new StudentChecking(accountHolder1.get(),new Money(checkingAccountDTO.getBalance()),
+                checkingAccountDTO.getSecretKey(), AccountStatus.ACTIVE);
 
-            if (accountHolder2.isPresent()) {
+            if (checkingAccountDTO.getSecondaryOwnerId()!=null) {
+                Optional<AccountHolder> accountHolder2 =accountHolderRepository.findById(checkingAccountDTO.getSecondaryOwnerId());
                 studentChecking.setSecondaryOwner(accountHolder2.get());
             }
-
             System.out.println("New Student Checking Account created");
             return studentCheckingRepository.save(studentChecking);
 
         } else {
-            CheckingAccount checking = new CheckingAccount(accountHolder1.get(),
-                    new Money(checkingAccountDTO.getBalance()),
-                    checkingAccountDTO.getSecretKey(),
-                    AccountStatus.ACTIVE);
-
-            if (accountHolder2.isPresent()) {
+                CheckingAccount checking = new CheckingAccount(accountHolder1.get(),new Money(checkingAccountDTO.getBalance()),
+                checkingAccountDTO.getSecretKey(),AccountStatus.ACTIVE);
+            if (checkingAccountDTO.getSecondaryOwnerId()!=null) {
+                Optional<AccountHolder> accountHolder2 =accountHolderRepository.findById(checkingAccountDTO.getSecondaryOwnerId());
                 checking.setSecondaryOwner(accountHolder2.get());
             }
-
             System.out.println("New Checking Account created");
             return checkingAccountRepository.save(checking);
         }
     }
+
+
 }

@@ -12,7 +12,7 @@ public class Role {
     private Long id;
     @Enumerated(value = EnumType.STRING)
     private UserRole role;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
 

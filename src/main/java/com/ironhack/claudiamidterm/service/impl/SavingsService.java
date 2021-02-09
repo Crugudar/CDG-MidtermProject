@@ -10,6 +10,7 @@ import org.springframework.stereotype.*;
 
 import java.math.*;
 import java.time.*;
+import java.util.*;
 
 @Service
 public class SavingsService<SavingsRepository> implements ISavingsService {
@@ -21,17 +22,19 @@ public class SavingsService<SavingsRepository> implements ISavingsService {
     AccountHolderRepository accountHolderRepository;
 
     public SavingsAccount create(SavingsAccountDTO savingsAccountDTO) {
-        AccountHolder accountHolder1 = accountHolderRepository.findById(savingsAccountDTO.getPrimaryOwnerId()).orElseThrow(()-> new IllegalArgumentException("User not found"));
-        AccountHolder accountHolder2 = savingsAccountDTO.getSecondaryOwnerId() != null ? accountHolderRepository.findById(savingsAccountDTO.getSecondaryOwnerId()).orElseThrow(()-> new IllegalArgumentException("User not found")) : null ;
+        Optional<AccountHolder> accountHolder1=accountHolderRepository.findById(savingsAccountDTO.getPrimaryOwnerId());
 
-        SavingsAccount savings = new SavingsAccount(accountHolder1,
+        SavingsAccount savings = new SavingsAccount(accountHolder1.get(),
                 new Money(savingsAccountDTO.getBalance()),
                 savingsAccountDTO.getSecretKey(),
                 savingsAccountDTO.getStatus());
 
-        if (accountHolder2 != null) {savings.setSecondaryOwner(accountHolder2);}
+        if (savingsAccountDTO.getSecondaryOwnerId() != null) {
+            Optional<AccountHolder> accountHolder2=accountHolderRepository.findById(savingsAccountDTO.getSecondaryOwnerId());
+            savings.setSecondaryOwner(accountHolder2.get());
 
-        savings.setLastInterestUpdate(LocalDate.now());
+        }
+
 
 
         return savingsAccountRepository.save(savings);

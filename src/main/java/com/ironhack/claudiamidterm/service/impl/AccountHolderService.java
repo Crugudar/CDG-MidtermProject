@@ -8,16 +8,24 @@ import com.ironhack.claudiamidterm.model.Role;
 import com.ironhack.claudiamidterm.repository.*;
 import com.ironhack.claudiamidterm.service.interfaces.*;
 import org.springframework.beans.factory.annotation.*;
-import org.springframework.context.annotation.*;
 import org.springframework.stereotype.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.math.*;
+import java.util.*;
 
 @Service
 public class AccountHolderService implements IAccountHolderService {
 
     @Autowired
     AccountHolderRepository accountHolderRepository;
+
+    @Autowired
+    UserRepository userRepository;
+
+    @Autowired
+    AccountRepository accountRepository;
 
     @Autowired
     RoleRepository roleRepository ;
@@ -52,4 +60,28 @@ public class AccountHolderService implements IAccountHolderService {
 
         return accountHolderRepository.save(accountHolder);
     }
+
+
+    public List<Account> getAllAccounts(CredentialsDTO credentials,String username) {
+        AccountHolder accountHolder=accountHolderRepository.findByUsername(username);
+        try{
+            passwordEncoder.matches(credentials.getPassword(), accountHolder.getPassword());
+            return accountRepository.findAllByPrimaryOwnerIdOrSecondaryOwnerId(accountHolder.getId(), accountHolder.getId());
+        }catch (Exception e){
+            throw new IllegalArgumentException("credentials do not correspond with any user");
+        }
+    }
+
+    @Override
+    public Money getAccountBalance(Long id, CredentialsDTO credentials, String username) {
+        AccountHolder accountHolder=accountHolderRepository.findByUsername(username);
+        try{
+            passwordEncoder.matches(credentials.getPassword(), accountHolder.getPassword());
+            Optional<Account> account=accountRepository.findById(id);
+            return account.get().getBalance();
+        }catch (Exception e){
+            throw new IllegalArgumentException("credentials do not correspond with any user/account");
+        }
+    }
+
 }

@@ -30,15 +30,27 @@ public class CheckingAccount extends StudentChecking {
     @JsonSerialize(using = LocalDateSerializer.class)
     private LocalDate lastMonthlyFee;
 
-
-
     public CheckingAccount() {
-        this.minimumBalance = new Money(new BigDecimal("250"));
     }
+
+    public CheckingAccount(Money minimumBalance, boolean belowMinimumBalance, @PastOrPresent LocalDate lastMonthlyFee) {
+        this.minimumBalance = minimumBalance;
+        this.belowMinimumBalance = belowMinimumBalance;
+        this.lastMonthlyFee = LocalDate.now();
+    }
+
+    public CheckingAccount(AccountHolder primaryOwner, Money balance, String secretKey, AccountStatus status, Money minimumBalance, boolean belowMinimumBalance, @PastOrPresent LocalDate lastMonthlyFee) {
+        super(primaryOwner, balance, secretKey, status);
+        this.minimumBalance = minimumBalance;
+        this.belowMinimumBalance = belowMinimumBalance;
+        this.lastMonthlyFee = LocalDate.now();
+    }
+
 
     public CheckingAccount(AccountHolder primaryOwner, Money balance, String secretKey, AccountStatus status) {
         super(primaryOwner, balance, secretKey, status);
         this.minimumBalance = new Money(new BigDecimal("250"));
+        this.lastMonthlyFee = LocalDate.now();
     }
 
     public Money getMinimumBalance() {
@@ -50,7 +62,6 @@ public class CheckingAccount extends StudentChecking {
     public Money getMonthlyMaintenanceFee() {
         return monthlyMaintenanceFee;
     }
-
     public boolean isBelowMinimumBalance() {return belowMinimumBalance;}
     public void setBelowMinimumBalance(boolean belowMinimumBalance) {this.belowMinimumBalance = belowMinimumBalance;}
 
