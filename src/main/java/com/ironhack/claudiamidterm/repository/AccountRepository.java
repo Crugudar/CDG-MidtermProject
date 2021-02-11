@@ -9,4 +9,7 @@ import java.util.*;
 @Repository
 public interface AccountRepository extends JpaRepository<Account, Long> {
     List<Account> findAllByPrimaryOwnerIdOrSecondaryOwnerId(Long id, Long secId);
+    List<Account> findAllByPrimaryOwnerId(Long id);
+
+    Account findOneByPrimaryOwnerId(Long id);
 }

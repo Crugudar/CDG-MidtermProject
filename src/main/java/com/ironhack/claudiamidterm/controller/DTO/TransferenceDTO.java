@@ -1,13 +1,22 @@
 package com.ironhack.claudiamidterm.controller.DTO;
 
+import javax.validation.constraints.*;
 import java.math.*;
 
 public class TransferenceDTO {
 
-
+    @NotNull
+    @NotEmpty
     private Long originId;
+    @NotNull
+    @NotEmpty
     private String receiverName;
+    @NotNull
+    @NotEmpty
     private Long destinationId;
+    @NotNull
+    @NotEmpty
+    @Digits(integer = 6, fraction = 2)
     private BigDecimal amount;
 
     public TransferenceDTO() {

@@ -6,6 +6,6 @@ import org.springframework.security.core.*;
 
 public interface IAccountService {
 
-    Account updateBalance(long id, String balance, CredentialsDTO credentials );
+    Account updateBalance(long id, String balance, CredentialsDTO credentials);
     // transfer(TransferenceDTO newTransference, Authentication authentication);
 }

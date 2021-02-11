@@ -25,7 +25,7 @@ public class FraudChecker {
 
         boolean result;
 
-        if (max.compareTo(BigDecimal.ZERO) == 0 || max.multiply(new BigDecimal("1.5")).compareTo(transferenceDTO.getAmount()) > 0 ) {
+        if (max.compareTo(BigDecimal.ZERO) == 0 || max.multiply(new BigDecimal("1.5")).compareTo(sumLastDayAmounts.add(transferenceDTO.getAmount())) > 0 ) {
             result = true;
         } else {
             result = false;

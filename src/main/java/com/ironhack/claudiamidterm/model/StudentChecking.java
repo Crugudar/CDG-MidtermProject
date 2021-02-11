@@ -10,7 +10,8 @@ import javax.persistence.*;
 public class StudentChecking extends Account {
 
     protected String secretKey;
-    protected AccountStatus status;
+    @Enumerated(value = EnumType.STRING)
+    private AccountStatus status=AccountStatus.ACTIVE;
 
 
     public StudentChecking() {}
@@ -18,7 +19,6 @@ public class StudentChecking extends Account {
     public StudentChecking(AccountHolder primaryOwner, Money balance, String secretKey, AccountStatus status) {
         super(primaryOwner, balance);
         this.secretKey = secretKey;
-        this.status = status;
     }
 
 

@@ -14,7 +14,8 @@ public class SavingsAccount extends Account{
 
 
     private String secretKey;
-    private AccountStatus status;
+    @Enumerated(value = EnumType.STRING)
+    private AccountStatus status=AccountStatus.ACTIVE;
     @Embedded
     @AttributeOverrides(value ={
             @AttributeOverride(name = "amount", column = @Column(name = "minimum_balance_amount")),
@@ -28,10 +29,9 @@ public class SavingsAccount extends Account{
 
     public SavingsAccount() {}
 
-    public SavingsAccount(AccountHolder primaryOwner, Money balance, String secretKey, AccountStatus status) {
+    public SavingsAccount(AccountHolder primaryOwner, Money balance, String secretKey) {
         super(primaryOwner, balance);
         this.secretKey = secretKey;
-        this.status = status;
         this.belowMinimumBalance =  false;
     }
 

@@ -6,4 +6,6 @@ import org.springframework.stereotype.*;
 
 @Repository
 public interface ThirdPartyRepository extends JpaRepository<ThirdParty, Long> {
+    ThirdParty findByName(String name);
+    ThirdParty findByHashKey(String key);
 }

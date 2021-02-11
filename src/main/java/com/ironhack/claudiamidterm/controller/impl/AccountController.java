@@ -22,7 +22,6 @@ public class AccountController {
     @ResponseStatus(HttpStatus.OK)
     public Account update(@PathVariable ("id")String id, @PathVariable ("newBalance") String newBalance, @RequestBody CredentialsDTO credentials) {
 
-
         return accountService.updateBalance(Long.parseLong(id),newBalance, credentials);
     }
 

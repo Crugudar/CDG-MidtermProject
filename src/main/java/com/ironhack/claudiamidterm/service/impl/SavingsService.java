@@ -26,8 +26,7 @@ public class SavingsService<SavingsRepository> implements ISavingsService {
 
         SavingsAccount savings = new SavingsAccount(accountHolder1.get(),
                 new Money(savingsAccountDTO.getBalance()),
-                savingsAccountDTO.getSecretKey(),
-                savingsAccountDTO.getStatus());
+                savingsAccountDTO.getSecretKey());
 
         if (savingsAccountDTO.getSecondaryOwnerId() != null) {
             Optional<AccountHolder> accountHolder2=accountHolderRepository.findById(savingsAccountDTO.getSecondaryOwnerId());

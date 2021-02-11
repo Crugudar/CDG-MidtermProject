@@ -36,4 +36,11 @@ public class AccountHolderController implements IAccountHolderController{
         return  accountHolderService.getAccountBalance(Long.parseLong(id), credentials, principal.getName());
     }
 
+    @PostMapping("/accounts/newTransfer")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Transference create(@RequestBody TransferenceDTO transferenceDTO, Principal principal) {
+        return accountHolderService.transfer(transferenceDTO, principal);
+    }
+
+
 }

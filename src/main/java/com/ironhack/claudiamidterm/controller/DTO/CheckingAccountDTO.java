@@ -14,7 +14,7 @@ public class CheckingAccountDTO {
     private BigDecimal balance;
     @NotNull
     private String secretKey;
-    private AccountStatus status;
+
 
     public CheckingAccountDTO() {
     }
@@ -23,7 +23,7 @@ public class CheckingAccountDTO {
         this.primaryOwnerId = primaryOwnerId;
         this.balance = new BigDecimal(balance);
         this.secretKey = secretKey;
-        this.status = AccountStatus.ACTIVE;
+
     }
 
     public CheckingAccountDTO(@NotNull Long primaryOwnerId, Long secondaryOwnerId, @NotNull Double balance, @NotNull String secretKey) {
@@ -31,7 +31,7 @@ public class CheckingAccountDTO {
         this.secondaryOwnerId = secondaryOwnerId;
         this.balance = new BigDecimal(balance);
         this.secretKey = secretKey;
-        this.status = AccountStatus.ACTIVE;;
+
     }
 
     public Long getPrimaryOwnerId() {
@@ -66,11 +66,5 @@ public class CheckingAccountDTO {
         this.secretKey = secretKey;
     }
 
-    public AccountStatus getStatus() {
-        return status;
-    }
 
-    public void setStatus(AccountStatus status) {
-        this.status = status;
-    }
 }

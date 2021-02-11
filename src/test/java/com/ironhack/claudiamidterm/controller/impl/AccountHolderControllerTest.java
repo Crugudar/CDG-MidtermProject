@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.*;
 import org.springframework.test.web.servlet.setup.*;
 import org.springframework.web.context.*;
 
+import javax.validation.constraints.AssertTrue;
 import java.io.*;
 import java.math.*;
 import java.time.*;
@@ -40,10 +41,19 @@ class AccountHolderControllerTest {
     private AccountHolderRepository accountHolderRepository;
 
     @Autowired
+    private AccountRepository accountRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private CheckingAccountRepository checkingAccountRepository;
 
     @Autowired
     private CreditCardRepository creditCardRepository;
+
+    @Autowired
+    private TransferenceRepository transferenceRepository;
 
     @Autowired
     private CheckingAccountController checkingAccountController;
@@ -56,7 +66,8 @@ class AccountHolderControllerTest {
     private ObjectMapper objectMapper = new ObjectMapper();
 
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
+    CreditCard creditCard;
+    CheckingAccount checkingAccount;
     @BeforeEach
     void setUp() {
 
@@ -67,15 +78,17 @@ class AccountHolderControllerTest {
         accountHolderRepository.saveAll(List.of(accountHolder1, accountHolder2));
         AccountHolder accountHolderFound= accountHolderRepository.findByName("Pablo");
         AccountHolder accountHolderFound2= accountHolderRepository.findByName("Clara");
-        checkingAccountController.create(new CheckingAccountDTO(accountHolderFound.getId(), accountHolderFound2.getId(),1000.00,"1234"));
-        creditCardController.create(new CreditCardDTO(0.1, accountHolderFound2.getId(), accountHolderFound.getId(),1000.00,300.00));
+        checkingAccount=(CheckingAccount) checkingAccountController.create(new CheckingAccountDTO(accountHolderFound.getId(), accountHolderFound2.getId(),1000.00,"1234"));
+        creditCard=creditCardController.create(new CreditCardDTO(0.1, accountHolderFound2.getId(), accountHolderFound.getId(),1000.00,300.00));
     }
 
     @AfterEach
     void tearDown() {
-        checkingAccountRepository.deleteAll();
-        creditCardRepository.deleteAll();
-        accountHolderRepository.deleteAll();
+//        transferenceRepository.deleteAll();
+//        checkingAccountRepository.deleteAll();
+//        creditCardRepository.deleteAll();
+//        accountHolderRepository.deleteAll();
+
     }
 
     @Test
@@ -109,11 +122,13 @@ class AccountHolderControllerTest {
     void getAccountBalance() throws Exception {
 
         CredentialsDTO credentialsDTO=new CredentialsDTO("pablo", "123456");
+        org.springframework.security.core.userdetails.User userSec = new User("pablo", "123456", AuthorityUtils.createAuthorityList("ACCOUNT_HOLDER"));
+       Optional<com.ironhack.claudiamidterm.model.User> user=userRepository.findByUsername("pablo");
+       Account account=accountRepository.findOneByPrimaryOwnerId(user.get().getId());
 
-        org.springframework.security.core.userdetails.User user = new User("pablo", "123456", AuthorityUtils.createAuthorityList("ACCOUNT_HOLDER"));
-        TestingAuthenticationToken testingAuthenticationToken = new TestingAuthenticationToken(user,null);
+        TestingAuthenticationToken testingAuthenticationToken = new TestingAuthenticationToken(userSec,null);
 
-        MvcResult result = mockMvc.perform(get("/accounts/1/check-balance")
+        MvcResult result = mockMvc.perform(get("/accounts/"+account.getId().toString()+"/check-balance")
                 .principal(testingAuthenticationToken)
                 .content(objectMapper.writeValueAsString(credentialsDTO))
                 .contentType(MediaType.APPLICATION_JSON))
@@ -121,5 +136,74 @@ class AccountHolderControllerTest {
 
         System.out.println(result.getResponse().getContentAsString());
         assertEquals("{\"amount\":1000.00,\"currency\":\"USD\"}",result.getResponse().getContentAsString());
+    }
+
+    @Test
+    void transfer_everyThingValid() throws Exception {
+
+        org.springframework.security.core.userdetails.User userSec = new User("pablo", "123456", AuthorityUtils.createAuthorityList("ACCOUNT_HOLDER"));
+        Optional<com.ironhack.claudiamidterm.model.User> user=userRepository.findByUsername("pablo");
+        Account account=accountRepository.findOneByPrimaryOwnerId(user.get().getId());
+        TransferenceDTO transferenceDTO=new TransferenceDTO(account.getId(),creditCard.getPrimaryOwner().getName(), creditCard.getId(),new BigDecimal("200") );
+
+        TestingAuthenticationToken testingAuthenticationToken = new TestingAuthenticationToken(userSec,null);
+
+        MvcResult result = mockMvc.perform(post("/accounts/newTransfer")
+                .principal(testingAuthenticationToken)
+                .content(objectMapper.writeValueAsString(transferenceDTO))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated()).andReturn();
+
+        assertTrue(result.getResponse().getContentAsString().contains("200.00"));
+    }
+
+    @Test
+    void transfer_notEnoghFunds() throws Exception {
+
+        org.springframework.security.core.userdetails.User userSec = new User("pablo", "123456", AuthorityUtils.createAuthorityList("ACCOUNT_HOLDER"));
+        Optional<com.ironhack.claudiamidterm.model.User> user=userRepository.findByUsername("pablo");
+        Account account=accountRepository.findOneByPrimaryOwnerId(user.get().getId());
+        TransferenceDTO transferenceDTO=new TransferenceDTO(account.getId(),creditCard.getPrimaryOwner().getName(), creditCard.getId(),new BigDecimal("1200") );
+
+        TestingAuthenticationToken testingAuthenticationToken = new TestingAuthenticationToken(user,null);
+
+        MvcResult result = mockMvc.perform(post("/accounts/newTransfer")
+                .principal(testingAuthenticationToken)
+                .content(objectMapper.writeValueAsString(transferenceDTO))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isConflict()).andReturn();
+
+    }
+
+    @Test
+    void transfer_beyondBalanceButWithCredit() throws Exception {
+
+        org.springframework.security.core.userdetails.User userSec = new User("pablo", "123456", AuthorityUtils.createAuthorityList("ACCOUNT_HOLDER"));
+        TransferenceDTO transferenceDTO=new TransferenceDTO(creditCard.getId(),checkingAccount.getPrimaryOwner().getName(), checkingAccount.getId(),new BigDecimal("1200") );
+
+        TestingAuthenticationToken testingAuthenticationToken = new TestingAuthenticationToken(userSec,null);
+
+        MvcResult result = mockMvc.perform(post("/accounts/newTransfer")
+                .principal(testingAuthenticationToken)
+                .content(objectMapper.writeValueAsString(transferenceDTO))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated()).andReturn();
+
+    }
+
+    @Test
+    void transfer_minimumBalance() throws Exception {
+
+        org.springframework.security.core.userdetails.User userSec = new User("pablo", "123456", AuthorityUtils.createAuthorityList("ACCOUNT_HOLDER"));
+       TransferenceDTO transferenceDTO=new TransferenceDTO(checkingAccount.getId(),creditCard.getPrimaryOwner().getName(), creditCard.getId(),new BigDecimal("900") );
+
+        TestingAuthenticationToken testingAuthenticationToken = new TestingAuthenticationToken(userSec,null);
+
+        MvcResult result = mockMvc.perform(post("/accounts/newTransfer")
+                .principal(testingAuthenticationToken)
+                .content(objectMapper.writeValueAsString(transferenceDTO))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated()).andReturn();
+
     }
 }

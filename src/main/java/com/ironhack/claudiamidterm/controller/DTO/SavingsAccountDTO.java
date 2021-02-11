@@ -20,8 +20,6 @@ public class SavingsAccountDTO {
     @DecimalMax(value = "0.5", message = "The interest rate cannot be higher than 0.5")
     @DecimalMin(value = "0" , message = "The interest rate cannot be 0 or below")
     private BigDecimal interestRate;
-    @NotNull
-    private AccountStatus status;
     @DecimalMax(value = "1000.00", message = "The maximum balance is 1000")
     @DecimalMin(value = "100.00", message = "The minimum balance is 100")
     private BigDecimal minimumBalance;
@@ -35,7 +33,7 @@ public class SavingsAccountDTO {
         this.secondaryOwnerId = secondaryOwnerId;
         this.balance = new BigDecimal(balance);
         this.secretKey = secretKey;
-        this.status = AccountStatus.ACTIVE;
+
         this.minimumBalance = new BigDecimal(minimumBalance);
         this.interestRate = new BigDecimal(interestRate);
     }
@@ -45,7 +43,6 @@ public class SavingsAccountDTO {
         this.secondaryOwnerId = secondaryOwnerId;
         this.balance = new BigDecimal(balance);
         this.secretKey = secretKey;
-        this.status = AccountStatus.ACTIVE;
         this.minimumBalance = minimumBalance;
         this.interestRate = new BigDecimal("0.0025");
     }
@@ -55,7 +52,6 @@ public class SavingsAccountDTO {
         this.secondaryOwnerId = secondaryOwnerId;
         this.balance = new BigDecimal(balance);
         this.secretKey = secretKey;
-        this.status = AccountStatus.ACTIVE;
         this.minimumBalance = new BigDecimal("1000");
         this.interestRate = new BigDecimal(interestRate);
     }
@@ -65,7 +61,6 @@ public class SavingsAccountDTO {
         this.secondaryOwnerId = secondaryOwnerId;
         this.balance = new BigDecimal(balance);
         this.secretKey = secretKey;
-        this.status = AccountStatus.ACTIVE;
         this.minimumBalance = new BigDecimal("1000");
         this.interestRate = new BigDecimal("0.0025");
     }
@@ -79,8 +74,6 @@ public class SavingsAccountDTO {
     public void setBalance(BigDecimal balance) {this.balance = balance;}
     public String getSecretKey() {return secretKey;}
     public void setSecretKey(String  secretKey) {this.secretKey = secretKey;}
-    public AccountStatus getStatus() {return status;}
-    public void setStatus(AccountStatus status) {this.status = status;}
     public BigDecimal getMinimumBalance() {return minimumBalance;}
     public void setMinimumBalance(BigDecimal minimumBalance) {this.minimumBalance = minimumBalance;}
     public BigDecimal getInterestRate() {return interestRate;}
