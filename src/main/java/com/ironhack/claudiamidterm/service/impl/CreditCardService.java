@@ -25,7 +25,7 @@ public class CreditCardService implements ICreditCardService {
         Optional<AccountHolder> accountHolder1=accountHolderRepository.findById(creditCardDTO.getPrimaryOwnerId());
 
 
-        CreditCard creditCard = new CreditCard(accountHolder1.get(), new Money(creditCardDTO.getBalance()));
+        CreditCard creditCard = new CreditCard(accountHolder1.get(),new Money(creditCardDTO.getBalance()));
 
         if (creditCardDTO.getCreditLimit()!=null){
             creditCard.setCreditLimit(new Money(creditCardDTO.getCreditLimit()));

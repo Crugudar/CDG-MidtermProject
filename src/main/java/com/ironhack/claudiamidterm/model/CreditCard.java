@@ -27,7 +27,9 @@ public class CreditCard extends Account{
 
     public CreditCard() {}
 
-    public CreditCard(AccountHolder primaryOwner, Money balance) {super(primaryOwner, balance);}
+    public CreditCard(AccountHolder primaryOwner, Money balance) {super(primaryOwner, balance);
+    this.lastInterestUpdate=LocalDate.now();
+    }
 
 
     public Money getCreditLimit() {return creditLimit;}

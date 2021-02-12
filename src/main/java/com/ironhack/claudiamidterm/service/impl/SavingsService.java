@@ -34,6 +34,14 @@ public class SavingsService<SavingsRepository> implements ISavingsService {
 
         }
 
+        if (savingsAccountDTO.getInterestRate() != null) {
+            savings.setInterestRate(savingsAccountDTO.getInterestRate());
+        }
+
+        if (savingsAccountDTO.getMinimumBalance() != null) {
+            savings.setMinimumBalance(new Money(savingsAccountDTO.getMinimumBalance()));
+        }
+
 
 
         return savingsAccountRepository.save(savings);

@@ -16,16 +16,19 @@ public class FraudChecker {
     @Autowired
     TransferenceRepository transferenceRepository;
 
-    public boolean firstCondition(TransferenceDTO transferenceDTO){
+    public boolean moreThanPercent(TransferenceDTO transferenceDTO){
 
         BigDecimal sumLastDayAmounts = transferenceRepository.sumLastDayTransferences(transferenceDTO.getOriginId());
-        List<BigDecimal> sumOfTransferenceByDay = transferenceRepository.sumOfTransferenceByDay(transferenceDTO.getOriginId());
-
-        BigDecimal max = sumOfTransferenceByDay.stream().max(BigDecimal::compareTo).orElse(BigDecimal.ZERO);
+        BigDecimal maxOfTransferenceinOneDay = transferenceRepository.maxOfTransferenceinOneDay(transferenceDTO.getOriginId());
 
         boolean result;
 
-        if (max.compareTo(BigDecimal.ZERO) == 0 || max.multiply(new BigDecimal("1.5")).compareTo(sumLastDayAmounts.add(transferenceDTO.getAmount())) > 0 ) {
+        if(sumLastDayAmounts==null){
+            sumLastDayAmounts=new BigDecimal("0");
+        }
+
+        if (maxOfTransferenceinOneDay.compareTo(BigDecimal.ZERO) == 0 ||
+                maxOfTransferenceinOneDay.multiply(new BigDecimal("1.5")).compareTo(sumLastDayAmounts.add(transferenceDTO.getAmount())) > 0 ) {
             result = true;
         } else {
             result = false;
@@ -33,7 +36,7 @@ public class FraudChecker {
         return result;
     }
 
-    public boolean secondCondition(TransferenceDTO transferenceDTO){
+    public boolean inLessThanOneSecond(TransferenceDTO transferenceDTO){
         boolean result;
 
         List<Transference> transferences = transferenceRepository.lastSecondTransferences(transferenceDTO.getOriginId());

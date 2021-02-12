@@ -38,7 +38,7 @@ public class AccountHolderController implements IAccountHolderController{
 
     @PostMapping("/accounts/newTransfer")
     @ResponseStatus(HttpStatus.CREATED)
-    public Transference create(@RequestBody TransferenceDTO transferenceDTO, Principal principal) {
+    public Transference transfer(@RequestBody TransferenceDTO transferenceDTO, Principal principal) {
         return accountHolderService.transfer(transferenceDTO, principal);
     }
 

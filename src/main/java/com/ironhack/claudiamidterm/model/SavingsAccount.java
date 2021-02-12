@@ -33,6 +33,7 @@ public class SavingsAccount extends Account{
         super(primaryOwner, balance);
         this.secretKey = secretKey;
         this.belowMinimumBalance =  false;
+        this.lastInterestUpdate=LocalDate.now();
     }
 
 

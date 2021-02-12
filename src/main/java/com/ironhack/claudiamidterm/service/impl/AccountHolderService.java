@@ -19,8 +19,7 @@ import java.security.*;
 import java.time.*;
 import java.util.*;
 
-import static com.ironhack.claudiamidterm.utils.Calculos.calculateYears;
-import static com.ironhack.claudiamidterm.utils.Calculos.calculateMonths;
+import static com.ironhack.claudiamidterm.utils.Calculos.*;
 
 @Service
 public class AccountHolderService implements IAccountHolderService {
@@ -107,19 +106,24 @@ public class AccountHolderService implements IAccountHolderService {
                 throw new IllegalArgumentException("Password doesn't match with the credentials");
             }
 
-            Integer months=calculateMonths(account.get().getCreatedDate());
 
             if(account.get() instanceof CreditCard){
                 Optional<CreditCard> creditcard = creditCardRepository.findById(account.get().getId());
-                addInterests(months, creditcard.get().getInterestRate(), creditcard.get());
-                creditcard.get().setCreatedDate(LocalDate.now());
+                BigDecimal monthlyInt=creditcard.get().getInterestRate().divide(new BigDecimal("12"), RoundingMode.HALF_UP);
+                Integer months=calculateMonths(creditcard.get().getLastInterestUpdate());
+                addInterests(months, monthlyInt, creditcard.get());
+                creditcard.get().setLastInterestUpdate(LocalDate.now());
             }
 
             if(account.get() instanceof SavingsAccount) {
                 Optional<SavingsAccount> savingsAccount = savingsAccountRepository.findById(account.get().getId());
 
-                if (calculateYears(account.get().getCreatedDate()) >= 1) {
-                    addInterests(12, savingsAccount.get().getInterestRate(), savingsAccount.get());
+                if (calculateYears(((SavingsAccount) account.get()).getLastInterestUpdate()) >= 1) {
+                    Integer completeYears=calculateYears(((SavingsAccount) account.get()).getLastInterestUpdate());
+                    addInterests(completeYears, savingsAccount.get().getInterestRate(), savingsAccount.get());
+
+                    savingsAccount.get().setLastInterestUpdate(savingsAccount.get().getLastInterestUpdate().plus(Period.ofYears(completeYears)));
+
                     savingsAccountRepository.save(savingsAccount.get());
                 }
                 if (savingsAccount.get().isBelowMinimumBalance() && savingsAccount.get().getBalance().getAmount().compareTo(savingsAccount.get().getMinimumBalance().getAmount()) > 0) {
@@ -129,6 +133,7 @@ public class AccountHolderService implements IAccountHolderService {
             }
             if(account.get() instanceof CheckingAccount) {
                 Optional<CheckingAccount> checkingAccount = checkingAccountRepository.findById(account.get().getId());
+                Integer months=calculateMonths(checkingAccount.get().getLastMonthlyFee());
                 Double balance = checkingAccount.get().getBalance().getAmount().doubleValue() - (months * 12);
                 checkingAccount.get().setBalance(new Money(new BigDecimal(balance)));
                 checkingAccount.get().setCreatedDate(LocalDate.now());
@@ -174,7 +179,7 @@ public class AccountHolderService implements IAccountHolderService {
 
         //Chequeo de fraude
 
-        if(!fraudChecker.firstCondition(transferenceDTO) || !fraudChecker.secondCondition(transferenceDTO)){
+        if(!fraudChecker.moreThanPercent(transferenceDTO) || !fraudChecker.inLessThanOneSecond(transferenceDTO)){
             if(originAccount instanceof SavingsAccount) {
                 Optional<SavingsAccount> account = savingsAccountRepository.findById(originAccount.getId());
                 account.get().setStatus(AccountStatus.FROZEN);
@@ -191,7 +196,7 @@ public class AccountHolderService implements IAccountHolderService {
                 studentCheckingRepository.save(studentCheckingAccount.get());
             }
 
-            throw  new IllegalArgumentException("This transference is against the fraud rules in our system");
+            throw  new ResponseStatusException(HttpStatus.FORBIDDEN, "This transference is against the fraud rules in our system");
         }
 
         //Comprobamos que hay saldo o crédito suficiente
@@ -264,6 +269,7 @@ public class AccountHolderService implements IAccountHolderService {
             Double interest =account.getBalance().getAmount().doubleValue()*interestRate.doubleValue();
             BigDecimal newBalance=new BigDecimal(account.getBalance().getAmount().doubleValue()+interest);
             account.setBalance(new Money(newBalance));
+            accountRepository.save(account);
             acum++;
         }
     }

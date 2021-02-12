@@ -65,4 +65,11 @@ public class CheckingAccount extends StudentChecking {
     public boolean isBelowMinimumBalance() {return belowMinimumBalance;}
     public void setBelowMinimumBalance(boolean belowMinimumBalance) {this.belowMinimumBalance = belowMinimumBalance;}
 
+    public LocalDate getLastMonthlyFee() {
+        return lastMonthlyFee;
+    }
+
+    public void setLastMonthlyFee(LocalDate lastMonthlyFee) {
+        this.lastMonthlyFee = lastMonthlyFee;
+    }
 }
